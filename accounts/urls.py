@@ -1,12 +1,23 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
+from rest_framework.routers import DefaultRouter
 
 
 app_name = "accounts"
+router = DefaultRouter()
+router.register(
+    "doctor_signup", views.DoctorViewSet, basename="doctor_signup"
+)  # this endpoint is used to create a doctor account
+router.register(
+    "pharmacist_signup", views.PharmacistViewSet, basename="Pharmacist_signup"
+)  # this endpoint is used to create a pharmacist account
+router.register(
+    "specialization", views.SpecializationViewSet, basename="specialization"
+)  # this endpoint is used to create a specialization
 
 urlpatterns = [
-    # path('patient/', include('patient.urls', namespace='patient')),
-    # path('doctor/', include('doctor.urls', namespace='doctor')),
-    # path('pharmacist/', include('pharmacist.urls', namespace='pharmacist')),
-    # path('specialization/', include('specialization.urls', namespace='specialization')),
+    path(
+        "signup/", views.signup, name="signup"
+    ),  # this endpoint is used to create a new account
+    path("", include(router.urls)),
 ]
