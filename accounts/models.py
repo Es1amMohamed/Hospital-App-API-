@@ -4,6 +4,8 @@ from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password
 from django.core.validators import MinLengthValidator
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 GENDER = [
@@ -48,6 +50,8 @@ class Patient(models.Model):
         """
 
         ordering = ["-created_at"]
+        verbose_name_plural = "patients"
+        verbose_name = "patient"
 
     def __str__(self):
         """
@@ -76,7 +80,7 @@ class Patient(models.Model):
 
         """
 
-        if not self.pk or "password" in self._modified_fields:
+        if not self.pk:
             self.password = make_password(self.password)
             self.password_confirmation = make_password(self.password_confirmation)
 
@@ -124,6 +128,8 @@ class Doctor(models.Model):
         """
 
         ordering = ["-created_at"]
+        verbose_name_plural = "Doctors"
+        verbose_name = "Doctor"
 
     def __str__(self):
         """
@@ -160,9 +166,9 @@ class Doctor(models.Model):
         if not self.slug:
             self.slug = slugify(self.user_name)
 
-        if not self.pk or "password" in self.dirty_fields:
+        if not self.pk:
             self.password = make_password(self.password)
-            self.password_confirmation = make_password(self.password_confirmation)
+            self.password_confirmation = self.password
 
         super(Doctor, self).save(*args, **kwargs)
 
@@ -199,6 +205,8 @@ class Pharmacist(models.Model):
         """
 
         ordering = ["-created_at"]
+        verbose_name_plural = "Pharmacists"
+        verbose_name = "Pharmacist"
 
     def __str__(self):
         """
@@ -231,9 +239,9 @@ class Pharmacist(models.Model):
         if not self.slug:
             self.slug = slugify(self.user_name)
 
-        if not self.pk or "password" in self.dirty_fields:
+        if not self.pk:
             self.password = make_password(self.password)
-            self.password_confirmation = make_password(self.password_confirmation)
+            self.password_confirmation = self.password
 
         super(Pharmacist, self).save(*args, **kwargs)
 
@@ -256,6 +264,8 @@ class Specialization(models.Model):
         """
 
         ordering = ["-created_at"]
+        verbose_name_plural = "Specializations"
+        verbose_name = "Specialization"
 
     def __str__(self):
         """
@@ -275,3 +285,135 @@ class Specialization(models.Model):
             self.slug = slugify(self.name)
 
         super(Specialization, self).save(*args, **kwargs)
+
+
+class PatientProfile(models.Model):
+    """
+    in this model we will create the patient_profile table in the database,
+    and we will define the fields of the table.
+
+    """
+
+    Patient_name = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name="patient_profile"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        """
+        this class will define the ordering of the patient_profile
+
+        """
+
+        ordering = ["-created_at"]
+        verbose_name_plural = "Patients Profiles"
+        verbose_name = "Patient Profile"
+
+    def __str__(self):
+        """
+        this function will return the name of the patient_profile in the admin panel
+
+        """
+
+        return f"{self.Patient_name} profile"
+
+    def save(self, *args, **kwargs):
+        """
+        this function will create the slug of the patient_profile
+
+        """
+
+        if not self.slug:
+            self.slug = slugify(self.Patient_name)
+
+        super(PatientProfile, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Patient)
+def create_patient_profile(sender, instance, created, **kwargs):
+    """
+    this function will create the patient_profile when the patient is created
+
+    """
+
+    if created:
+        PatientProfile.objects.create(Patient_name=instance)
+
+
+class DoctorProfile(models.Model):
+    """
+    in this model we will create the doctor_profile table in the database,
+    and we will define the fields of the table.
+
+    """
+
+    doctor_name = models.ForeignKey(
+        Doctor, on_delete=models.CASCADE, related_name="doctor_profile"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Doctors Profiles"
+        verbose_name = "Doctor Profile"
+
+    def __str__(self):
+        return f"{self.doctor_name} profile"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.doctor_name)
+
+        super(DoctorProfile, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Doctor)
+def create_doctor_profile(sender, instance, created, **kwargs):
+    """
+    this function will create the doctor_profile when the doctor.active is True
+
+    """
+
+    if instance.active:
+        DoctorProfile.objects.create(doctor=instance)
+
+
+class PharmacistProfile(models.Model):
+    """
+    in this model we will create the pharmacist_profile table in the database,
+    and we will define the fields of the table.
+
+    """
+
+    pharmacist_name = models.ForeignKey(
+        Pharmacist, on_delete=models.CASCADE, related_name="pharmacist_profile"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Pharmacists Profiles"
+        verbose_name = "Pharmacist Profile"
+
+    def __str__(self):
+        return f"{self.pharmacist_name} profile"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.pharmacist_name)
+
+        super(PharmacistProfile, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Pharmacist)
+def create_pharmacist_profile(sender, instance, created, **kwargs):
+    """
+    this function will create the pharmacist_profile when the pharmacist.active is True
+
+    """
+
+    if instance.active:
+        PharmacistProfile.objects.create(pharmacist_name=instance)
