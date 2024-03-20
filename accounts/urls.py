@@ -14,10 +14,16 @@ router.register(
 router.register(
     "specialization", views.SpecializationViewSet, basename="specialization"
 )  # this endpoint is used to create a specialization
+router.register(
+    "update/profile",
+    views.UpdatePatientProfileViewSet,
+    basename="update_patient_profile",
+)  # this endpoint is used to update a patient profile
 
 urlpatterns = [
     path(
         "signup/", views.signup, name="signup"
     ),  # this endpoint is used to create a new account
     path("", include(router.urls)),
+    path("profile/<int:pk>/", views.get_patient_profile, name="profile"),
 ]

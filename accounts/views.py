@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from .models import *
 from .serializers import *
 from rest_framework.decorators import api_view
@@ -92,3 +92,21 @@ class SpecializationViewSet(viewsets.ModelViewSet):
 
     serializer_class = SpecializationSerializer
     queryset = Specialization.objects.all()
+
+
+@api_view(["GET"])
+def get_patient_profile(request, pk):
+    """
+    this function will get the patient profile
+    """
+
+    patient = get_object_or_404(Patient, pk=pk)
+    serializer = PatientProfileSerializer(patient)
+    return Response(serializer.data)
+
+
+class UpdatePatientProfileViewSet(viewsets.ModelViewSet):
+    """this class is used to update a patient profile and check if the patient profile already exists"""
+
+    serializer_class = UpdateProfilePatientSerializer
+    queryset = Patient.objects.all()

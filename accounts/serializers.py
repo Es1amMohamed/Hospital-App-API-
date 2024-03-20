@@ -43,3 +43,24 @@ class SpecializationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Specialization
         exclude = ["id", "slug", "created_at"]
+
+
+class PatientProfileSerializer(serializers.ModelSerializer):
+    """this class will create the serializer of the patient profile model"""
+
+    class Meta:
+        model = Patient
+        fields = ["first_name", "last_name", "address", "email", "gender", "blood_type"]
+
+
+class UpdateProfilePatientSerializer(serializers.ModelSerializer):
+    """
+    this class will create the serializer of the patient model
+    to check if the patient profile already
+    exists and update it
+
+    """
+
+    class Meta:
+        model = Patient
+        exclude = ["id", "slug", "created_at", "password", "password_confirmation"]
