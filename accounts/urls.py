@@ -20,10 +20,32 @@ router.register(
     basename="update_patient_profile",
 )  # this endpoint is used to update a patient profile
 
+router.register(
+    "update/doctor/profile",
+    views.UpdateDoctorProfileViewSet,
+    basename="update_doctor_profile",
+)
+
+router.register(
+    "update/pharmacist/profile",
+    views.UpdatePharmacistProfileViewSet,
+    basename="update_pharmacist_profile",
+)
+
 urlpatterns = [
     path(
         "signup/", views.signup, name="signup"
     ),  # this endpoint is used to create a new account
     path("", include(router.urls)),
-    path("profile/<int:pk>/", views.get_patient_profile, name="profile"),
+    path("patient/login/", views.patient_login, name="login"),
+    path(
+        "doctor/login/",
+        views.DoctorViewSet.as_view({"post": "login"}),
+        name="doctor_login",
+    ),
+    path(
+        "pharmacist/login/",
+        views.PharmacistViewSet.as_view({"post": "login"}),
+        name="pharmacist_login",
+    ),
 ]

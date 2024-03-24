@@ -29,12 +29,42 @@ class DoctorSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class DoctorProfileSerializer(serializers.ModelSerializer):
+    """this class will create the serializer of the doctor profile model"""
+
+    class Meta:
+        model = Doctor
+        exclude = [
+            "id",
+            "slug",
+            "created_at",
+            "password",
+            "password_confirmation",
+            "active",
+        ]
+
+
 class PharmacistSerializer(serializers.ModelSerializer):
     """this class will create the serializer of the pharmacist model"""
 
     class Meta:
         model = Pharmacist
         exclude = ["id", "slug", "created_at"]
+
+
+class PharmacistProfileSerializer(serializers.ModelSerializer):
+    """this class will create the serializer of the pharmacist profile model"""
+
+    class Meta:
+        model = Pharmacist
+        exclude = [
+            "id",
+            "slug",
+            "created_at",
+            "password",
+            "password_confirmation",
+            "active",
+        ]
 
 
 class SpecializationSerializer(serializers.ModelSerializer):
@@ -45,15 +75,7 @@ class SpecializationSerializer(serializers.ModelSerializer):
         exclude = ["id", "slug", "created_at"]
 
 
-class PatientProfileSerializer(serializers.ModelSerializer):
-    """this class will create the serializer of the patient profile model"""
-
-    class Meta:
-        model = Patient
-        fields = ["first_name", "last_name", "address", "email", "gender", "blood_type"]
-
-
-class UpdateProfilePatientSerializer(serializers.ModelSerializer):
+class ProfilePatientSerializer(serializers.ModelSerializer):
     """
     this class will create the serializer of the patient model
     to check if the patient profile already

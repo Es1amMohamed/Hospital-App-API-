@@ -294,7 +294,7 @@ class PatientProfile(models.Model):
 
     """
 
-    Patient_name = models.ForeignKey(
+    Patient_name = models.OneToOneField(
         Patient, on_delete=models.CASCADE, related_name="patient_profile"
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -348,7 +348,7 @@ class DoctorProfile(models.Model):
 
     """
 
-    doctor_name = models.ForeignKey(
+    doctor_name = models.OneToOneField(
         Doctor, on_delete=models.CASCADE, related_name="doctor_profile"
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -377,7 +377,7 @@ def create_doctor_profile(sender, instance, created, **kwargs):
     """
 
     if instance.active:
-        DoctorProfile.objects.create(doctor=instance)
+        DoctorProfile.objects.create(doctor_name=instance)
 
 
 class PharmacistProfile(models.Model):
@@ -387,7 +387,7 @@ class PharmacistProfile(models.Model):
 
     """
 
-    pharmacist_name = models.ForeignKey(
+    pharmacist_name = models.OneToOneField(
         Pharmacist, on_delete=models.CASCADE, related_name="pharmacist_profile"
     )
     created_at = models.DateTimeField(auto_now_add=True)
